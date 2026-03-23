@@ -1,14 +1,17 @@
-// db.js — Sets up the PostgreSQL connection pool using the pg library.
-// The Pool object reuses connections efficiently instead of creating a new one per query.
+// db.js — Uses SQLite locally (no setup required)
+const Database = require('better-sqlite3');
+const db = new Database('expenses.db');
 
-const { Pool } = require('pg');
-require('dotenv').config();
+// Create table if not exists
+db.exec(`
+  CREATE TABLE IF NOT EXISTS expenses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    amount REAL NOT NULL,
+    category TEXT,
+    date TEXT DEFAULT (date('now')),
+    created_at TEXT DEFAULT (datetime('now'))
+  )
+`);
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false // Required for Render/ElephantSQL hosted DBs
-  }
-});
-
-module.exports = pool;
+module.exports = db;
